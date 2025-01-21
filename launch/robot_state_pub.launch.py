@@ -1,13 +1,12 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
-
+import launch
 from launch import LaunchDescription
 from launch.substitutions import LaunchConfiguration, Command
 from launch.actions import DeclareLaunchArgument
 from launch_ros.actions import Node
 import xacro
-
 from launch_ros.descriptions import ParameterValue
 
 def generate_launch_description():
@@ -29,7 +28,13 @@ def generate_launch_description():
 		executable='robot_state_publisher',
 		output='screen',
 		parameters=[params]
-		)
+	)
+
+	# Get the logger for the launch file
+	logger = launch.logging.get_logger()
+
+	# Log an info message
+	logger.info("Use sim_time is " + use_sim_time)
 
 	# Launch!
 	return LaunchDescription([
@@ -43,4 +48,4 @@ def generate_launch_description():
 			description='Use ros2_control if true'),
 
 		node_robot_state_publisher
-		])
+	])

@@ -3,9 +3,9 @@
 <package format="3">
   <name>autonomous_mobile_robot</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Development of a simple 2WD Autonomous Mobile Robot</description>
   <maintainer email="khan.shahudullah54@gmail.com">Shahudullah Khan</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache License 2.0</license>
 
   <exec_depend>ros2launch</exec_depend>
 
@@ -17,7 +17,7 @@
 
   <exec_depend>joint_state_publisher</exec_depend>
   <exec_depend>robot_state_publisher</exec_depend>
-  <exec_depend>rviz</exec_depend>
+  <exec_depend>ros2_visualizer</exec_depend>
   <exec_depend>xacro</exec_depend>
 
   <export>
