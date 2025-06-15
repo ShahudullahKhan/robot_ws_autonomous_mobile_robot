@@ -2,24 +2,50 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>autonomous_mobile_robot</name>
-  <version>0.0.0</version>
-  <description>Development of a simple 2WD Autonomous Mobile Robot</description>
+  <version>0.1.0</version>
+  <description>Development of a simple 2WD Autonomous Mobile Robot with ROS 2, Gazebo, and SLAM/RTAB-Map integration.</description>
   <maintainer email="khan.shahudullah54@gmail.com">Shahudullah Khan</maintainer>
   <license>Apache License 2.0</license>
 
-  <exec_depend>ros2launch</exec_depend>
-
+  <!-- Build tools -->
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <!-- Build dependencies -->
+  <build_depend>xacro</build_depend>
+  <build_depend>rclcpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+
+  <!-- Run dependencies -->
+  <exec_depend>rclcpp</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>ros2launch</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>gazebo_plugins</exec_depend>
+  <exec_depend>controller_manager</exec_depend>
+  <exec_depend>ros2_control</exec_depend>
+  <exec_depend>diff_drive_controller</exec_depend>
+  <exec_depend>joint_state_broadcaster</exec_depend>
+  <exec_depend>teleop_twist_joy</exec_depend>
+  <exec_depend>joy</exec_depend>
+  <exec_depend>v4l2_camera</exec_depend>
+  <exec_depend>rtabmap_ros</exec_depend>
+  <exec_depend>depthimage_to_laserscan</exec_depend>
+  <exec_depend>tf2_geometry_msgs</exec_depend>
+
+  <!-- Test dependencies -->
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
-
-  <exec_depend>joint_state_publisher</exec_depend>
-  <exec_depend>robot_state_publisher</exec_depend>
-  <exec_depend>ros2_visualizer</exec_depend>
-  <exec_depend>xacro</exec_depend>
-
+  <!-- Export -->
   <export>
     <build_type>ament_cmake</build_type>
   </export>

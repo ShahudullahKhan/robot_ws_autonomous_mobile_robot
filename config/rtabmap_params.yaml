@@ -1,0 +1,85 @@
+rtabmap:
+  ros__parameters:
+    # Basic settings
+    use_sim_time: true
+    frame_id: base_footprint  # Changed from camera_link for better TF tree
+    subscribe_depth: true
+    subscribe_rgbd: true
+    subscribe_imu: true
+    subscribe_odom_info: true
+    approx_sync: true
+    wait_imu_to_init: true
+    queue_size: 10  # Reduced from 100 to prevent memory overload
+    database_path: "~/.ros/rtabmap.db"
+    save_database_on_shutdown: true
+
+    # Grid map settings
+    Grid/FromDepth: true
+    Grid/RayTracing: true
+    Grid/MaxGroundHeight: 0.1
+    Grid/MaxObstacleHeight: 2.0
+    Grid/MinClusterSize: 20
+    Grid/MaxGroundAngle: 45
+    Grid/ClusterRadius: 0.1
+    Grid/CellSize: 0.05
+
+    # Visual odometry optimization
+    Vis/MinInliers: 20
+    Vis/RoiRatios: "0.03 0.03 0.04 0.04"
+    Vis/MaxDepth: 10.0
+    Vis/MinDepth: 0.3
+    Vis/EstimationType: 1  # 0=3D->3D, 1=3D->2D (PnP)
+    Vis/FeatureType: 6    # GFTT/FREAK
+
+    # Memory management
+    Mem/IncrementalMemory: true  # Changed to true for continuous mapping
+    Mem/NotLinkedNodesKept: true
+    Mem/STMSize: 30
+    Mem/ImagePreDecimation: 2
+    Mem/ImagePostDecimation: 2
+    Mem/LaserScanNormalK: 10
+    Mem/LaserScanVoxelSize: 0.05
+
+    # Loop closure settings
+    RGBD/LoopClosureReextractFeatures: true
+    RGBD/LocalRadius: 5
+    RGBD/LinearUpdate: 0.1  # Reduced from 0.2 for more frequent updates
+    RGBD/AngularUpdate: 0.05  # Reduced from 0.1 for more frequent updates
+    RGBD/OptimizeFromGraphEnd: true
+    RGBD/ProximityBySpace: true
+    RGBD/ProximityMaxGraphDepth: 50
+    RGBD/ProximityPathMaxNeighbors: 10
+    RGBD/NeighborLinkRefining: true
+
+    # ICP settings for loop closure refinement
+    Icp/VoxelSize: 0.05
+    Icp/MaxCorrespondenceDistance: 0.1
+    Icp/PointToPlane: true
+    Icp/Iterations: 30
+
+    # Graph optimization
+    Optimizer/Strategy: 1  # GTSAM
+    Optimizer/Iterations: 50  # Increased from 30
+    Optimizer/Epsilon: 0.0001
+    RGBD/OptimizeMaxError: 1.0  # Reduced from 3.0 for stricter optimization
+
+    # Gazebo-specific
+    Gazebo/SimTime: true
+    Gazebo/DepthNoise: false
+    Gazebo/IMUFrameId: imu_link
+
+    # Input/Output topics
+    map_frame_id: "map"
+    rgb/image: "/camera/color/image_raw"
+    depth/image: "/camera/depth/image_raw"
+    rgb/camera_info: "/camera/color/camera_info"
+    imu/data: "/imu/data"
+    odom_frame_id: "odom"
+
+    # QoS settings for better real-time performance
+    qos_image: 2
+    qos_imu: 2
+    qos_odom: 2
+    qos_scan: 2
+    qos_user_data: 2
+    qos_gps: 2
