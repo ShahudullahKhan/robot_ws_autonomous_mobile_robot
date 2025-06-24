@@ -4,7 +4,6 @@ rtabmap:
     use_sim_time: true
     frame_id: base_footprint  # Changed from camera_link for better TF tree
     subscribe_depth: true
-    subscribe_rgbd: true
     subscribe_imu: true
     subscribe_odom_info: true
     approx_sync: true
@@ -18,10 +17,10 @@ rtabmap:
     Grid/RayTracing: true
     Grid/MaxGroundHeight: 0.1
     Grid/MaxObstacleHeight: 2.0
-    Grid/MinClusterSize: 20
+    Grid/MinClusterSize: 10
     Grid/MaxGroundAngle: 45
     Grid/ClusterRadius: 0.1
-    Grid/CellSize: 0.05
+    Grid/CellSize: 0.1
 
     # Visual odometry optimization
     Vis/MinInliers: 20
@@ -69,12 +68,12 @@ rtabmap:
     Gazebo/IMUFrameId: imu_link
 
     # Input/Output topics
-    map_frame_id: "map"
+    map_frame: "map"
     rgb/image: "/camera/color/image_raw"
     depth/image: "/camera/depth/image_raw"
     rgb/camera_info: "/camera/color/camera_info"
     imu/data: "/imu/data"
-    odom_frame_id: "odom"
+    odom_frame: "odom"
 
     # QoS settings for better real-time performance
     qos_image: 2

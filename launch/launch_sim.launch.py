@@ -86,25 +86,6 @@ def generate_launch_description():
     rtabmap_group = GroupAction([
         PushRosNamespace(rtabmap_namespace),
 
-        
-        
-        # RGBD Sync node
-        Node(
-            package='rtabmap_sync',
-            executable='rgbd_sync',
-            output='screen',
-            parameters=[
-                rtabmap_params_file,
-                {'use_sim_time': True}
-            ],
-            remappings=[
-                ('rgb/image', '/camera/color/image_raw'),
-                ('rgb/camera_info', '/camera/color/camera_info'),
-                ('depth/camera_info', '/camera/depth/camera_info'),
-                ('depth/image', '/camera/depth/image_raw')
-            ]
-        ),
-
         # IMU Filter node
         Node(
             package='imu_filter_madgwick',
@@ -133,6 +114,7 @@ def generate_launch_description():
                 ('/imu', '/imu/data'),
                 ('rgb/image', '/camera/color/image_raw'),
                 ('depth/image', '/camera/depth/image_raw'),
+                ('depth/camera_info', '/camera/depth/camera_info'),
                 ('rgb/camera_info', '/camera/color/camera_info')
             ]
         ),
@@ -149,15 +131,17 @@ def generate_launch_description():
                     'use_sim_time': True,
                     'frame_id': 'base_footprint',
                     'subscribe_depth': True,
-                    'subscribe_rgb': True,
                     'approx_sync': True
                 }
             ],
             remappings=[
                 ('rgb/image', '/camera/color/image_raw'),
                 ('depth/image', '/camera/depth/image_raw'),
+                ('depth/camera_info', '/camera/depth/camera_info'),
                 ('rgb/camera_info', '/camera/color/camera_info'),
-                ('/imu', '/imu/data')
+                ('/imu', '/imu/data'),
+                ('/rtabmap/mapData', 'mapData'),
+                ('/rtabmap/cloud_map', 'cloud_map'),
             ],
             arguments=['-d']  # Delete database on start
         ),
@@ -174,11 +158,30 @@ def generate_launch_description():
             ],
             remappings=[
                 ('/imu', '/imu/data'),
-                ('mapData', 'mapData'),
-                ('mapGraph', 'mapGraph'),
+                ('/rtabmap/mapData', 'mapData'),
+                ('/rtabmap/cloud_map', 'cloud_map'),
+                ('/rtabmap/mapGraph', 'mapGraph'),
                 ('odom', 'odom')
             ]
-        )
+        ),
+
+         Node(
+            package='rtabmap_util', executable='point_cloud_xyz', output='screen',
+            parameters=[{'decimation': 2,
+                         'max_depth': 3.0,
+                         'voxel_size': 0.02}],
+            remappings=[('depth/image', '/camera/depth/image_raw'),
+                        ('depth/camera_info', '/camera/camera_info'),
+                        ('cloud', '/camera/cloud')]),
+        Node(
+            package='rtabmap_util', executable='obstacles_detection', output='screen',
+            parameters=[
+                rtabmap_params_file,
+                {'use_sim_time': True}
+                ],
+            remappings=[('cloud', '/camera/cloud'),
+                        ('obstacles', '/camera/obstacles'),
+                        ('ground', '/camera/ground')])
     ])
 
    
