@@ -183,8 +183,15 @@ def generate_launch_description():
                         ('obstacles', '/camera/obstacles'),
                         ('ground', '/camera/ground')])
     ])
-
-   
+    
+    
+    # Delayed rtabmap_group execution
+    delayed_rtabmap_group = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=spawn_entity,
+            on_exit=[rtabmap_group],
+        )
+    )  
 
     # Replace the diff_drive_spawner in the final return with delayed_diff_drive_spawner
 
@@ -198,5 +205,5 @@ def generate_launch_description():
         spawn_entity,
         delayed_diff_drive_spawner,
         delayed_joint_broad_spawner,
-        rtabmap_group,
+        delayed_rtabmap_group,
     ])
