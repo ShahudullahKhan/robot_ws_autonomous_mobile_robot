@@ -21,7 +21,7 @@ def generate_launch_description():
 	robot_description_config = ParameterValue(Command(['xacro ', xacro_file, ' use_ros2_control:=', use_ros2_control, ' sim_mode:=', use_sim_time]), value_type=str)
 
 	# Create a robot_state_publisher_node
-	params = {'robot_description': robot_description_config, 'use_sim_time': use_sim_time}
+	params = {'robot_description': robot_description_config, 'use_sim_time': use_sim_time, 'publish_frequency': 50.0}
 	node_robot_state_publisher = Node(
 		package='robot_state_publisher',
 		executable='robot_state_publisher',

@@ -76,16 +76,19 @@ def generate_launch_description():
     #rtabmap_params_file = os.path.join(get_package_share_directory(package_name),'config','rtabmap_params.yaml')
 
     localization = LaunchConfiguration('localization')
+    
     parameters={
           'frame_id':'base_footprint',
           'odom_frame_id':'odom',
           'odom_tf_linear_variance':0.001,
           'odom_tf_angular_variance':0.001,
           'subscribe_depth':True,
-          'subscribe_rgbd':True,
+          'subscribe_rgbd':False,
           'subscribe_scan':False,
+          'subscribe_odom':True,
           'approx_sync':True,
           'sync_queue_size': 10,
+          'wait_for_transform': 0.3,
           # RTAB-Map's internal parameters should be strings
           'RGBD/NeighborLinkRefining': 'true',    # Do odometry correction with consecutive laser scans
           'RGBD/ProximityBySpace':     'true',    # Local loop closure detection (using estimated position) with locations in WM
@@ -93,7 +96,7 @@ def generate_launch_description():
           'RGBD/ProximityPathMaxNeighbors': '10', # Do also proximity detection by space by merging close scans together.
           'Reg/Strategy':              '0',       # 0=Visual, 1=ICP, 2=Visual+ICP
           'Vis/MinInliers':            '12',      # 3D visual words minimum inliers to accept loop closure
-          'RGBD/OptimizeFromGraphEnd': 'false',   # Optimize graph from initial node so /map -> /odom transform will be generated
+          'RGBD/OptimizeFromGraphEnd': 'true',   # Optimize graph from initial node so /map -> /odom transform will be generated
           'RGBD/OptimizeMaxError':     '4',       # Reject any loop closure causing large errors (>3x link's covariance) in the map
           'Reg/Force3DoF':             'true',    # 2D SLAM
           'Grid/FromDepth':            'false',   # Create 2D occupancy grid from laser scan
@@ -110,7 +113,6 @@ def generate_launch_description():
         ('rgb/image',       '/camera/image_raw'),
         ('depth/image',     '/camera/depth/image_raw'),
         ('rgb/camera_info', '/camera/camera_info'),
-        ('rgbd_image',     '/rtabmap/rgbd_image'),
         ]
         
     config_rviz = os.path.join(
@@ -122,28 +124,21 @@ def generate_launch_description():
 
     rtabmap_group = GroupAction([
         PushRosNamespace(rtabmap_namespace),
-        
-        Node(
-            package='rtabmap_sync', executable='rgbd_sync', output='screen',
-            parameters=[parameters,
-              {'rgb_image_transport':'compressed',
-               'depth_image_transport':'compressedDepth',
-               'approx_sync_max_interval': 0.02}],
-            remappings=remappings
-            ),
 
-        # RTAB-Map Visual odometry node
-        # Node(
-        #     package='rtabmap_odom',
-        #     executable='rgbd_odometry',
-        #     name='rgbd_odometry',
-        #     output='screen',
-        #     parameters=[
-        #         parameters,
-        #         {'use_sim_time': True}
-        #     ],
-        #     remappings=remappings
-        # ),
+        #RTAB-Map Visual odometry node
+        Node(
+            package='rtabmap_odom',
+            executable='rgbd_odometry',
+            name='rgbd_odometry',
+            output='screen',
+            parameters=[
+                {
+                    'use_sim_time': True
+                },
+                parameters
+            ],
+            remappings=remappings
+        ),
         
 
         # RTAB-Map SLAM node
@@ -155,11 +150,7 @@ def generate_launch_description():
             parameters=[
                 parameters,
                 {
-                    'use_sim_time': True,
-                    'frame_id': 'base_footprint',
-                    'subscribe_rgbd':True,
-                    'subscribe_depth': True,
-                    'approx_sync': True
+                    'use_sim_time': True
                 }
             ],
             remappings=remappings,
@@ -182,34 +173,30 @@ def generate_launch_description():
             package='rtabmap_viz',
             executable='rtabmap_viz',
             output='screen',
+            condition=IfCondition(LaunchConfiguration("rtabmap_viz")),
             parameters=[
                 parameters,
-                {'use_sim_time': True}
+                {
+                    'use_sim_time': True
+                },
             ],
             remappings=remappings
             ),
 
         Node(
-            package='rtabmap_util', executable='point_cloud_xyz', output='screen',
-            parameters=[{'decimation': 2,
-                         'max_depth': 3.0,
-                         'voxel_size': 0.02}],
-            remappings=[('depth/image', '/camera/depth/image_raw'),
-                        ('depth/camera_info', '/camera/camera_info'),
-                        ('cloud', '/camera/cloud')]
-            ),
-        
-        Node(
-            package='rtabmap_util', executable='obstacles_detection', output='screen',
-            parameters=[
-                parameters,
-                {'use_sim_time': True}
-                ],
-            remappings=[
-                ('cloud', '/camera/cloud'),
-                ('obstacles', '/camera/obstacles'),
-                ('ground', '/camera/ground')]
-            )
+            package='rviz2', executable='rviz2', name="rviz2", output='screen',
+            condition=IfCondition(LaunchConfiguration("rviz")),
+            arguments=[["-d"], [LaunchConfiguration("rviz_cfg")]]),
+
+        # Node(
+        #     package='rtabmap_util', executable='point_cloud_xyz', output='screen',
+        #     parameters=[{'decimation': 2,
+        #                  'max_depth': 3.0,
+        #                  'voxel_size': 0.02}],
+        #     remappings=[('depth/image', '/camera/depth/image_raw'),
+        #                 ('depth/camera_info', '/camera/camera_info'),
+        #                 ('cloud', '/camera/cloud')]
+        #     ),
     ])
     
     
@@ -225,8 +212,9 @@ def generate_launch_description():
 
     # Launch them all!
     return LaunchDescription([
+        DeclareLaunchArgument('rtabmap_viz',  default_value='true',  description='Launch RTAB-Map UI (optional).'),
         DeclareLaunchArgument('use_sim_time', default_value='true',description='Use simulation (Gazebo) clock if true'),
-        DeclareLaunchArgument('rviz',         default_value='false', description='Launch RVIZ (optional).'),
+        DeclareLaunchArgument('rviz',         default_value='true', description='Launch RVIZ (optional).'),
         DeclareLaunchArgument('localization', default_value='false', description='Launch in localization mode.'),
         DeclareLaunchArgument('rviz_cfg', default_value=config_rviz,  description='Configuration path of rviz2.'),
         
